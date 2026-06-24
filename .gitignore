@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Wygenerowane raporty
+reports/
+*.pdf
+!data/*.pdf
+
+# System
+.DS_Store
+Thumbs.db

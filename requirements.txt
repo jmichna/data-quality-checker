@@ -1,0 +1,10 @@
+pandas
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+scikit-learn
+jinja2
+weasyprint
+pytest
+httpx
