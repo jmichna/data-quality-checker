@@ -1,9 +1,9 @@
-# Modele danych (Pydantic) - to "kontrakty", jakie krążą po całej aplikacji.
+"""Modele danych (Pydantic) - to "kontrakty", jakie krążą po całej aplikacji.
 
-# W C# byłyby to klasy DTO z atrybutami walidacji. Pydantic robi to samo:
-# opisujemy kształt danych raz, a FastAPI automatycznie waliduje i serializuje
-# je do/z JSON-a.
-
+W C# byłyby to klasy DTO z atrybutami walidacji. Pydantic robi to samo:
+opisujemy kształt danych raz, a FastAPI automatycznie waliduje i serializuje
+je do/z JSON-a.
+"""
 from __future__ import annotations
 
 from typing import Any

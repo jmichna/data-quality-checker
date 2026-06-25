@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 1.6cm; }
+  body { font-family: Helvetica, Arial, sans-serif; color: #1e293b; font-size: 11px; }
+  h1 { color: #4338ca; font-size: 20px; margin: 0 0 2px; }
+  .meta { color: #64748b; font-size: 10px; }
+  .rule { border-bottom: 2px solid #6366f1; margin: 6px 0 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  .gradecell { width: 70px; height: 70px; background: {{ grade_color }}; color: #ffffff;
+               font-size: 36px; font-weight: bold; text-align: center; vertical-align: middle; }
+  .scorebig { font-size: 26px; font-weight: bold; color: #1e293b; }
+  .scorelbl { color: #64748b; font-size: 11px; }
+  .section { color: #4338ca; font-size: 14px; margin: 18px 0 6px; font-weight: bold; }
+  .checks th { background: #eef2ff; color: #4338ca; text-align: left; padding: 6px 8px;
+               border-bottom: 1px solid #c7d2fe; font-size: 10px; }
+  .checks td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-size: 10px; }
+  .pass { color: #16a34a; font-weight: bold; }
+  .fail { color: #dc2626; font-weight: bold; }
+  .barwrap { background: #eef2ff; }
+  .barfill { padding: 0; font-size: 2px; line-height: 8px; }
+  .sugg td { background: #f5f7ff; border-left: 3px solid #6366f1; padding: 6px 8px;
+             font-size: 10px; }
+  .footer { color: #94a3b8; font-size: 9px; text-align: center; margin-top: 22px; }
+</style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td><h1>Raport jakosci danych</h1></td>
+      <td style="text-align:right" class="meta">
+        ID: {{ report.report_id }}<br>
+        {{ report.dataset.rows }} wierszy &times; {{ report.dataset.columns }} kolumn
+      </td>
+    </tr>
+  </table>
+  <div class="rule"></div>
+
+  <!-- Ocena ogolna -->
+  <table>
+    <tr>
+      <td style="width:80px"><table><tr><td class="gradecell">{{ report.grade }}</td></tr></table></td>
+      <td style="padding-left:14px">
+        <span class="scorebig">{{ report.overall_score }}/100</span><br>
+        <span class="scorelbl">Ogolna ocena jakosci danych</span>
+      </td>
+    </tr>
+  </table>
+
+  <div class="section">Wyniki poszczegolnych checkow</div>
+  <table class="checks">
+    <tr><th>Check</th><th width="70">Wynik</th><th width="35%">Pasek</th><th width="60">Status</th></tr>
+    {% for c in report.checks %}
+    <tr>
+      <td>{{ c.label }}</td>
+      <td><b>{{ c.score }}</b></td>
+      <td class="barwrap">
+        <table cellpadding="0" cellspacing="0" style="width: {{ c.score | bar_width }}%;">
+          <tr><td class="barfill" style="background: {{ c.score | bar_color }};">&nbsp;</td></tr>
+        </table>
+      </td>
+      <td>{% if c.passed %}<span class="pass">OK</span>{% else %}<span class="fail">Uwaga</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div class="section">Sugestie czyszczenia</div>
+  <table class="sugg">
+    {% for s in report.suggestions %}
+    <tr><td>{{ s }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <div class="footer">Wygenerowano przez Data Quality Checker &middot; projekt WZSI</div>
+</body>
+</html>

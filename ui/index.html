@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Quality Checker</title>
+<style>
+  :root{
+    --bg1:#6366f1; --bg2:#8b5cf6; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --line:#e2e8f0; --good:#16a34a; --warn:#ca8a04; --bad:#dc2626; --accent:#6366f1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:var(--ink);
+       background:linear-gradient(135deg,var(--bg1),var(--bg2));min-height:100vh;padding:32px 16px}
+  .wrap{max-width:960px;margin:0 auto}
+  header{text-align:center;color:#fff;margin-bottom:28px}
+  header h1{font-size:30px;font-weight:800;letter-spacing:-.5px}
+  header p{opacity:.85;margin-top:6px}
+  .card{background:var(--card);border-radius:18px;padding:26px;box-shadow:0 20px 45px rgba(0,0,0,.18);margin-bottom:22px}
+
+  /* Upload */
+  .drop{border:2.5px dashed #c7d2fe;border-radius:14px;padding:42px 20px;text-align:center;
+        cursor:pointer;transition:.2s;background:#f5f7ff}
+  .drop:hover,.drop.over{border-color:var(--accent);background:#eef2ff}
+  .drop .ic{font-size:46px}
+  .drop h3{margin:10px 0 4px;font-size:18px}
+  .drop p{color:var(--muted);font-size:14px}
+  .fname{margin-top:14px;font-size:14px;color:var(--accent);font-weight:600}
+  .btn{margin-top:18px;background:var(--accent);color:#fff;border:none;border-radius:10px;
+       padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.ghost{background:#eef2ff;color:var(--accent)}
+
+  /* Result */
+  #result{display:none}
+  .scorerow{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+  .gauge{--p:0;--c:var(--good);width:150px;height:150px;border-radius:50%;flex:0 0 auto;
+    background:conic-gradient(var(--c) calc(var(--p)*1%), #eef2ff 0);
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .gauge::before{content:"";position:absolute;inset:14px;background:#fff;border-radius:50%}
+  .gauge .val{position:relative;text-align:center}
+  .gauge .val b{font-size:34px}
+  .gauge .val small{display:block;color:var(--muted);font-size:12px}
+  .gradebadge{font-size:60px;font-weight:800;width:96px;height:96px;border-radius:22px;color:#fff;
+    display:flex;align-items:center;justify-content:center}
+  .summary h2{font-size:20px}
+  .summary p{color:var(--muted);margin-top:4px}
+  .dl{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+  .checks{margin-top:8px}
+  .check{margin:14px 0}
+  .check .top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+  .check .top b{font-weight:600}
+  .bar{height:10px;border-radius:6px;background:#eef2ff;overflow:hidden}
+  .bar>span{display:block;height:100%;border-radius:6px;transition:width .8s ease}
+  .issues{font-size:12.5px;color:var(--muted);margin-top:5px;padding-left:2px}
+
+  h4.sec{margin:22px 0 10px;color:var(--accent);font-size:16px}
+  .sugg li{background:#f5f7ff;border-left:4px solid var(--accent);padding:9px 12px;border-radius:6px;
+    margin:7px 0;font-size:13.5px;list-style:none}
+  .err{color:var(--bad);font-weight:600;margin-top:12px;text-align:center}
+  .spinner{display:none;margin:18px auto 0;width:34px;height:34px;border:4px solid #eef2ff;
+    border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:6px}
+  .stat{background:#f5f7ff;border-radius:12px;padding:14px;text-align:center}
+  .stat b{display:block;font-size:22px}
+  .stat small{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔎 Data Quality Checker</h1>
+    <p>Wgraj plik CSV i sprawdz jakosc swoich danych w kilka sekund</p>
+  </header>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      <div class="ic">📂</div>
+      <h3>Przeciagnij plik CSV tutaj</h3>
+      <p>albo kliknij, aby wybrac z dysku</p>
+      <div class="fname" id="fname"></div>
+      <input type="file" id="file" accept=".csv" hidden>
+    </div>
+    <div style="text-align:center">
+      <button class="btn" id="go" disabled>Analizuj jakosc</button>
+      <div class="spinner" id="spin"></div>
+      <div class="err" id="err"></div>
+    </div>
+  </div>
+
+  <div class="card" id="result">
+    <div class="scorerow">
+      <div class="gauge" id="gauge"><div class="val"><b id="scoreNum">0</b><small>/ 100</small></div></div>
+      <div class="gradebadge" id="grade">A</div>
+      <div class="summary">
+        <h2 id="verdict">Ocena jakosci</h2>
+        <p id="dims"></p>
+        <div class="dl">
+          <button class="btn ghost" id="dlHtml">📄 Raport HTML</button>
+          <button class="btn ghost" id="dlPdf">📑 Raport PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="stats"></div>
+
+    <h4 class="sec">Wyniki checkow</h4>
+    <div class="checks" id="checks"></div>
+
+    <h4 class="sec">Sugestie czyszczenia</h4>
+    <ul class="sugg" id="sugg"></ul>
+  </div>
+</div>
+
+<script>
+// Adres API - pusty oznacza "ten sam serwer" (gdy serwujemy UI z FastAPI).
+const API = "";
+let lastId = null;
+
+const $ = (id) => document.getElementById(id);
+const drop = $("drop"), fileInput = $("file");
+
+drop.onclick = () => fileInput.click();
+["dragover","dragenter"].forEach(e => drop.addEventListener(e, ev => {ev.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(e => drop.addEventListener(e, ev => {ev.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop", ev => { if(ev.dataTransfer.files.length) selectFile(ev.dataTransfer.files[0]); });
+fileInput.onchange = () => { if(fileInput.files.length) selectFile(fileInput.files[0]); };
+
+function selectFile(f){
+  $("fname").textContent = "Wybrano: " + f.name;
+  $("go").disabled = false;
+  window._file = f;
+}
+
+function colorFor(s){ return s>=90 ? getCss('--good') : s>=70 ? getCss('--warn') : getCss('--bad'); }
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+$("go").onclick = async () => {
+  if(!window._file) return;
+  $("err").textContent = ""; $("spin").style.display="block"; $("go").disabled=true;
+  const fd = new FormData(); fd.append("file", window._file);
+  try{
+    const r = await fetch(API + "/analyze", {method:"POST", body:fd});
+    if(!r.ok){ const e = await r.json().catch(()=>({detail:r.statusText})); throw new Error(e.detail||"Blad analizy"); }
+    render(await r.json());
+  }catch(e){ $("err").textContent = "⚠ " + e.message; }
+  finally{ $("spin").style.display="none"; $("go").disabled=false; }
+};
+
+function render(rep){
+  lastId = rep.report_id;
+  $("result").style.display = "block";
+
+  // Animacja gauge + licznika
+  const gauge = $("gauge"), score = rep.overall_score, col = colorFor(score);
+  gauge.style.setProperty("--c", col);
+  let cur = 0;
+  const step = () => { cur += Math.max(1,(score-cur)*0.12);
+    if(cur>=score) cur=score;
+    gauge.style.setProperty("--p", cur);
+    $("scoreNum").textContent = Math.round(cur);
+    if(cur<score) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+
+  const gradeColors = {A:'#16a34a',B:'#65a30d',C:'#ca8a04',D:'#ea580c',F:'#dc2626'};
+  $("grade").textContent = rep.grade;
+  $("grade").style.background = gradeColors[rep.grade] || '#64748b';
+
+  const verdicts = {A:'Dane sa w bardzo dobrym stanie',B:'Dobra jakosc, drobne poprawki',
+    C:'Dane wymagaja czyszczenia',D:'Powazne problemy z jakoscia',F:'Dane niewiarygodne'};
+  $("verdict").textContent = verdicts[rep.grade] || 'Ocena jakosci';
+  $("dims").textContent = rep.dataset.rows + " wierszy × " + rep.dataset.columns + " kolumn";
+
+  const passed = rep.checks.filter(c=>c.passed).length;
+  $("stats").innerHTML =
+    stat(rep.dataset.rows,"wiersze") + stat(rep.dataset.columns,"kolumny") +
+    stat(passed+"/"+rep.checks.length,"checki OK") + stat(rep.suggestions.length,"sugestie");
+
+  $("checks").innerHTML = rep.checks.map(c=>{
+    const col = colorFor(c.score);
+    const iss = c.issues.length ? `<div class="issues">• ${c.issues.join("<br>• ")}</div>` : "";
+    return `<div class="check"><div class="top"><b>${c.label}</b><span>${c.score}/100</span></div>
+      <div class="bar"><span style="width:${c.score}%;background:${col}"></span></div>${iss}</div>`;
+  }).join("");
+
+  $("sugg").innerHTML = rep.suggestions.map(s=>`<li>${s}</li>`).join("");
+  $("result").scrollIntoView({behavior:"smooth"});
+}
+function stat(v,l){ return `<div class="stat"><b>${v}</b><small>${l}</small></div>`; }
+
+$("dlHtml").onclick = () => lastId && window.open(API + "/report/" + lastId + "/html","_blank");
+$("dlPdf").onclick  = () => lastId && window.open(API + "/report/" + lastId + "/pdf","_blank");
+</script>
+</body>
+</html>

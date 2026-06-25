@@ -36,10 +36,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> **WeasyPrint (PDF)** na Windows wymaga zwykle pakietu GTK
-> (https://github.com/Kozea/WeasyPrint/releases) lub instalacji przez MSYS2.
-> Jesli generowanie PDF sprawia problem, reszta aplikacji (JSON + HTML) dziala
-> niezaleznie - PDF mozna potraktowac jako dodatek.
+> **PDF** generowany jest przez `xhtml2pdf` - czysto pythonowa bibliotke, ktora
+> NIE wymaga zadnych bibliotek systemowych. Dziala od razu po `pip install`.
+> (Wczesniej uzywany WeasyPrint na Windowsie wymagal GTK/Pango - dlatego go zmieniono.)
 
 ## Uruchomienie
 
@@ -78,7 +77,7 @@ app/
     scoring.py       # silnik oceny
   checks/            # 8 niezaleznych checkow jakosci
   models/schemas.py  # modele Pydantic
-  report/            # generowanie HTML/PDF (Jinja2 + WeasyPrint)
+  report/            # generowanie HTML/PDF (Jinja2 + xhtml2pdf)
 ui/index.html        # dashboard HTML+JS
 tests/               # testy pytest
 data/sample.csv      # przykladowy dataset
@@ -86,4 +85,4 @@ data/sample.csv      # przykladowy dataset
 
 ## Technologie
 
-`pandas`, `FastAPI`, `json`, `scikit-learn`, `Jinja2`, `WeasyPrint`, `pytest`.
+`pandas`, `FastAPI`, `json`, `scikit-learn`, `Jinja2`, `xhtml2pdf`, `pytest`.

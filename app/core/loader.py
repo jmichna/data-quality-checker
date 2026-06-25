@@ -1,8 +1,8 @@
-#DataLoader - wczytywanie pliku CSV do pandas.DataFrame.
+"""DataLoader - wczytywanie pliku CSV do pandas.DataFrame.
 
-# Odpowiada wyłącznie za bezpieczne wczytanie danych: wykrycie separatora,
-# poradzenie sobie z kodowaniem i sensowne błędy, gdy plik jest zepsuty.
-
+Odpowiada wyłącznie za bezpieczne wczytanie danych: wykrycie separatora,
+poradzenie sobie z kodowaniem i sensowne błędy, gdy plik jest zepsuty.
+"""
 from __future__ import annotations
 
 import io
@@ -11,11 +11,16 @@ import pandas as pd
 
 
 class DataLoadError(Exception):
-    """Brak poprawnego pliku .CSV lub nieudane wczytanie danych."""
+    """Rzucany, gdy pliku nie da się wczytać jako poprawnego CSV."""
 
 
 def load_csv(source: str | bytes | io.BytesIO) -> pd.DataFrame:
+    """Wczytuje CSV ze ścieżki, bajtów lub strumienia.
 
+    sep=None + engine='python' sprawia, że pandas sam wykrywa separator
+    (przecinek, średnik, tab). Najpierw próbujemy UTF-8, a gdy padnie -
+    latin-1, bo polskie pliki bywają w roznych kodowaniach.
+    """
     if isinstance(source, bytes):
         source = io.BytesIO(source)
 
@@ -33,7 +38,7 @@ def load_csv(source: str | bytes | io.BytesIO) -> pd.DataFrame:
             continue
         except pd.errors.EmptyDataError as exc:
             raise DataLoadError("Plik CSV jest pusty.") from exc
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             raise DataLoadError(f"Nie udalo sie wczytac CSV: {exc}") from exc
 
     raise DataLoadError("Nie udalo sie rozpoznac kodowania pliku.")

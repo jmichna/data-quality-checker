@@ -1,0 +1,19 @@
+id,name,age,email,city,salary,active,country
+1,Anna Kowalska,28,anna@example.com,Warszawa,5500,yes,PL
+2,Jan Nowak,34,jan.nowak@example.com,Krakow,6200,yes,PL
+2,Jan Nowak,34,jan.nowak@example.com,Krakow,6200,yes,PL
+3,Piotr Zielinski,,piotr@example.com, Gdansk ,5800,Yes,PL
+4,Maria Wisniewska,41,maria_example.com,Wroclaw,7100,no,PL
+5,Tomasz Lewandowski,29,tomasz@example.com,Poznan,,YES,PL
+6,Katarzyna Dabrowska,150,kasia@example.com,Warszawa,6000,no,PL
+7,Krzysztof Wojcik,38,brak,Lodz,99999,yes,PL
+8,Magdalena Kaminska,-5,magda@example.com,Szczecin,6400,no,PL
+9,Pawel Kowalczyk,45,,Lublin,,yes,PL
+10,Agnieszka Zajac,31,aga@example.com, warszawa,5700,no,PL
+11,Marcin Krol,36,marcin@example.com,Katowice,6100,Yes,PL
+12,Ewa Majewska,27,ewa@example.com, Gdansk,5600,yes,PL
+13,Robert Olszewski,52,robert@example.com,Bialystok,8200,no,PL
+14,Joanna Pawlak,,joanna@example.com,Gdynia,5950,YES,PL
+15,Lukasz Adamski,33,lukasz@example.com,Opole,5850,no,PL
+16,Natalia Sikora,250,natalia@example.com,Rzeszow,6300,yes,PL
+17,Michal Baran,40, ,Torun,6700,no,PL
