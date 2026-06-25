@@ -1,0 +1,31 @@
+id,name,age,email,city,salary,active,country
+1,Anna Kowalska,250,anna_example.com, warszawa ,99999999,yes,PL
+1,Anna Kowalska,250,anna_example.com, warszawa ,99999999,yes,PL
+1,Anna Kowalska,250,anna_example.com, warszawa ,99999999,yes,PL
+2,,,,,,,PL
+2,,,,,,,PL
+2,,,,,,,PL
+2,,,,,,,PL
+3,jan nowak,-15,brak,KRAKOW,,Y,PL
+3,jan nowak,-15,brak,KRAKOW,,Y,PL
+3,jan nowak,-15,brak,KRAKOW,,Y,PL
+4,,999,, ,-5000,1,PL
+4,,999,, ,-5000,1,PL
+5,,,,,,,PL
+5,,,,,,,PL
+5,,,,,,,PL
+6,,170,maria@@example,,,true,PL
+6,,170,maria@@example,,,true,PL
+7,,500,,POZNAN ,,NO,PL
+7,,500,,POZNAN ,,NO,PL
+8,,,,,,,PL
+8,,,,,,,PL
+8,,,,,,,PL
+9,,-100,, Lodz,,,PL
+10,,12345,brak,  gdansk  ,,n,PL
+11,,-3,,,,,PL
+12,,300,,,,,PL
+13,,,,,,,PL
+13,,,,,,,PL
+14,,,,,,,PL
+14,,,,,,,PL

@@ -6,11 +6,28 @@ traktowac wszystkie checki jednakowo (polimorfizm).
 """
 from __future__ import annotations
 
+import warnings
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
 from app.models.schemas import CheckResult
+
+
+def text_columns(df: pd.DataFrame) -> pd.Index:
+    """Zwraca nazwy kolumn tekstowych, odpornie na rozne wersje pandas.
+
+    W pandas 3 `select_dtypes(include="object")` ostrzega, ze domyslnie lapie
+    tez nowy typ 'str'. Najpierw jawnie prosimy o oba typy (to wycisza ostrzezenie
+    na nowym pandas). Starszy pandas nie zna tokena "str" i rzuca wyjatek -
+    wtedy wracamy do "object", tlumiac samo ostrzezenie deprecjacyjne.
+    """
+    try:
+        return df.select_dtypes(include=["object", "str"]).columns
+    except (TypeError, ValueError):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            return df.select_dtypes(include=["object"]).columns
 
 
 class BaseCheck(ABC):

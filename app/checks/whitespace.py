@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from app.checks.base import BaseCheck
+from app.checks.base import BaseCheck, text_columns
 from app.models.schemas import CheckResult
 
 
@@ -18,7 +18,7 @@ class WhitespaceCheck(BaseCheck):
     weight = 0.10
 
     def run(self, df: pd.DataFrame) -> CheckResult:
-        text_cols = df.select_dtypes(include="object").columns
+        text_cols = text_columns(df)
         if len(text_cols) == 0:
             return self._result(100.0, {"note": "Brak kolumn tekstowych."}, [])
 
